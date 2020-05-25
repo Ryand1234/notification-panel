@@ -1,5 +1,5 @@
 {
   "/api/*": {
-    "target": "https://chating1-app.herokuapp.com"
+    "target": "https://notification-panel.herokuapp.com"
   }
 }
