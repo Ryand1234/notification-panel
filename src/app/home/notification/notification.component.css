@@ -1,0 +1,18 @@
+button{
+	display: block;
+	flex: 1 1 auto;
+	background: none;
+	background-color: yellow;
+	color: red;
+
+}
+
+button:hover {
+	transform: skew(10deg);
+	box-shadow: 10px 10px 10px pink;
+}
+
+
+.toolbar{
+	background-color: black;
+}
