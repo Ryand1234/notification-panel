@@ -10,7 +10,7 @@ export class LoginService {
   constructor(private http : HttpClient) { }
 
 	login(data:any) {
-//		console.log("data: ",data);
+		console.log("data: ",data);
 		return this.http.post(this.url, data);
 	}
 }
