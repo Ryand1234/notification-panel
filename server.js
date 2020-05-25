@@ -1,6 +1,8 @@
 var express = require('express')
 var logger = require('morgan')
 var mongo = require('mongodb')
+var bodyParser = require('body-parser')
+var session = require('express-session')
 
 var app = express();
 
