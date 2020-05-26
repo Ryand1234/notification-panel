@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as io from 'socket.io-client';
 import { Observable } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -10,11 +10,11 @@ export class NotifyService {
 
 	constructor(private http : HttpClient) { }
         private socket = io('http://localhost:3000')
-        private url = '/api/user/';
+        private url = '/api/profile';
 
-        getUser(token: any){
-        		var new_url = this.url + token;
-                return this.http.get(new_url);
+        httpOptions = new HttpHeaders({'Content-Type':'application/json; charset=utf-8'});
+        getUser(){
+                return this.http.post(this.url, { headers: this.httpOptions, responseType: 'json'});
         }
 
         incommingNotification(){

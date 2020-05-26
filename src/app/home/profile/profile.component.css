@@ -12,7 +12,36 @@ button:hover {
 	box-shadow: 10px 10px 10px pink;
 }
 
+.profile{
+	color: black;
+}
 
 .toolbar{
 	background-color: black;
+}
+
+.notify{
+	color: black;
+	background-color: white;
+	border: 5px solid blue;
+	text-align: center;
+}
+
+.cross{
+	font-size: 25px;
+	color: red;
+	float: right;
+	border: none;
+	margin-bottom: 5px;
+	background: none;
+}
+
+.cross:hover {
+	box-shadow: 10px 10px 10px grey;
+}
+
+.notify-msg{
+	margin: 15px ;
+	background-color: white;
+
 }

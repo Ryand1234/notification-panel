@@ -99,6 +99,8 @@ onResize(event?) {
   //var result = this.http.post('/api/user/register',data);
   this.registerService.register(userinfo).subscribe((result)=>{
   this.msg = result;
+  $(".register").hide();
+  $(".login").show();
   });
   }
 
