@@ -7,16 +7,36 @@ var bodyParser = require('body-parser')
 var session = require('express-session')
 var path = require('path')
 var logger = require('morgan')
+var redis = require('redis')
+var redisClient = redis.createClient({
+	port : 12212,
+	host : process.env.REDIS_URI
+});
+redisClient.auth(process.env.REDIS_PASSWORD);
+
+var redisStore = require('connect-redis')(session)
 
 var app = express();
 
+const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:5000"
+const REDIS_URI = process.env.REDIS_URI || "localhost"
+
+
 app.use(logger('dev'));
 app.use(express.static(__dirname + '/dist'));
-app.use(session({secret:'ChatApp', resave:true, saveUninitialized: true}));
+app.use(session({
+    secret: 'OmegaRanger',
+    resave: false,
+    saveUninitialized: true,
+    name: 'notification_cache',
+    cookie: { secure: false},
+    store: new redisStore({ host: REDIS_URI, port: 12212, client: redisClient, ttl: 1600}),
+}));
+
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:5000"
 
 var user_name;
 
@@ -92,51 +112,84 @@ app.get('/*', (req, res, next)=>{
 //User Profile
 app.post('/api/profile', (req, res, next)=>{
 
-    mongo.MongoClient.connect(MONGO_URI, (err, client)=>{
-        var user_db = client.db('notification').collection('user')
+    var id = req.session._id;
+    redisClient.get(id, (err, cache_data)=>{
+        if(cache_data == null){
+            mongo.MongoClient.connect(MONGO_URI, (err, client)=>{
+                var user_db = client.db('notification').collection('user')
 
-        user_db.findOne({_id : new mongo.ObjectId(req.session._id)}, (error, user)=>{
-            if(user == null){
-                res.status(500).json({"err" : "User doesn't Exist"})
-            }
-            else{
-                res.status(200).json(user);
-            }
-        })
+                user_db.findOne({_id : new mongo.ObjectId(req.session._id)}, (error, user)=>{
+                    if(user == null){
+                        res.status(500).json({"err" : "User doesn't Exist"})
+                    }
+                    else{
+                        redisClient.setex(id, 600, JSON.stringify(user));
+                        res.status(200).json(user);
+                    }
+                })
+            })        
+        }
+        else{
+
+            res.status(200).json(JSON.parse(cache_data));
+        }
     })
+    
+})
+
+
+//Is user already logged in
+app.post('/api/islogin', (req, res, next)=>{
+    if(req.session._id == null){
+        res.status(200).json({"logged" : false});
+    }
+    else{
+
+        res.status(200).json({"logged" : true})
+    }
 })
 
 
 //All Users
 app.post('/api/users', (req, res, next)=>{
 
-    mongo.MongoClient.connect(MONGO_URI, (err, client)=>{
+    redisClient.get('users', (err, cache_data)=>{
+        if(cache_data == null){
+            mongo.MongoClient.connect(MONGO_URI, (err, client)=>{
 
-        var user_db = client.db('notification').collection('user')
+                var user_db = client.db('notification').collection('user')
 
-        user_db.find({}).toArray((err, users)=>{
+                user_db.find({}).toArray((err, users)=>{
 
-            var data = new Array();
+                    var data = new Array();
 
-            for(var i = 0; i < users.length; i++){
-                if(users[i]._id != req.session._id){
-                    if(data.length == 0){
-                        data = [{
-                            user: users[i].name,
-                            _id: users[i]._id
-                        }]
+                    for(var i = 0; i < users.length; i++){
+                       // if(users[i]._id != req.session._id){
+                            if(data.length == 0){
+                                data = [{
+                                    user: users[i].name,
+                                    _id: users[i]._id
+                                }]
+                            }
+                            else{
+                                data.push({
+                                    user: users[i].name,
+                                    _id: users[i]._id
+                                })
+                            }
+                        //}
                     }
-                    else{
-                        data.push({
-                            user: users[i].name,
-                            _id: users[i]._id
-                        })
-                    }
-                }
-            }
-            res.status(200).json(data);
-        })
+                    redisClient.setex('users', 600, JSON.stringify(data))
+                    res.status(200).json(data);
+                })
+            })
+        }
+        else{
+
+            res.status(200).json(JSON.parse(cache_data));
+        }
     })
+    
 })
 
 
@@ -145,30 +198,35 @@ app.post('/api/user/login', (req, res, next)=>{
  //   console.log("URI: ",MONGO_URI)
         mongo.MongoClient.connect(MONGO_URI, (err, client)=>{
 
-                if(err)
-                        res.status(500).json({"err" : "Error"});
-                else{
+            if(err)
+                res.status(500).json({"err" : "Error"});
+            else{
 
-                        var user_db = client.db('notification').collection('user')
-			user_db.findOne({email : req.body.email}, (error, user)=>{
+                    var user_db = client.db('notification').collection('user')
+                user_db.findOne({email : req.body.email}, (error, user)=>{
 
-                                if (user != null){
-					var isValid = bcrypt.compareSync(req.body.passwd, user.passwd);
-					if(isValid)
-					{
-						user_name = user.username;
+                    if (user != null){
+                        var isValid = bcrypt.compareSync(req.body.passwd, user.passwd);  
+			   if(isValid)
+                        {
+                            user_name = user.username;
+                            req.session._id = user._id.toString();
+                            req.session.user = user.name;
 
-						req.session._id = user._id;
-						req.session.user = user.name;
-                                        	res.status(200).json({"msg" : "Login SuccessFUll"});
-					}
-					else
-						res.status(500).json({"err" : "Incorrect Password"});
-                                }else
-                                        res.status(500).json({"err" : "Incorrect Email"});
+                            var id = user._id.toString();
 
-                        });
-                }
+                        
+                            redisClient.setex(id, 600, JSON.stringify(user));
+
+                            res.status(200).json({"msg" : "Login SuccessFUll"});
+                        }
+                        else
+                            res.status(500).json({"err" : "Incorrect Password"});
+                    }else
+                        res.status(500).json({"err" : "Incorrect Email"});
+
+                });
+            }
         });
 });
 
@@ -176,16 +234,30 @@ app.post('/api/user/login', (req, res, next)=>{
 //Logout EndPoint
 app.post('/api/user/logout', (req, res, next)=>{
 
-	req.session.destroy((err) => {
+    console.log("ID1: ",req.session._id)
+    redisClient.del(req.session._id, (err, response)=>{
+        if(response == 1){
+            if(req.session._id != null){
+                req.session.destroy((err) => {
 
-                if(err) {
-                        res.status(500).json({"err" : "Error in Logout"});
-                }
-                else{
+                    if(err) {
+                            res.status(500).json({"err" : "Error in Logout"});
+                    }
+                    else{
+
+                        res.status(200).json({"msg" : "Logout Sucessfull"});
+                    }
+                });
+            }
+            else{
+                res.status(200).json({"msg" : "Logout Sucessfull"});
+            }
+        }
+        else{
+            res.status(500).json({"err" : "Error in Logout"});
+        }
+    })
 	
-			res.status(200).json({"msg" : "Logout Sucessfull"});
-		}
-        });
 
 });
 
@@ -194,7 +266,7 @@ app.post('/api/user/logout', (req, res, next)=>{
 app.post('/api/user/register', (req, res, next)=>{
 
 	var hashedPasswd = bcrypt.hashSync(req.body.passwd, 8);
-	console.log("Hashed Password: ",hashedPasswd);
+
         var data = {
                 email : req.body.email,
                 passwd : hashedPasswd,
