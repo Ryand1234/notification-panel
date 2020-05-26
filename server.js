@@ -52,19 +52,30 @@ mongo.MongoClient.connect(MONGO_URI,(err, client)=>{
                 }
 
                 user_db.findOne({ _id : new mongo.ObjectId(id)}, (error, user)=>{
-                        var notify = user.notification;
-                        if(notify.length == 0){
-                            notify = [notification]
-                        }
-                        else{
-                            notify.push(notification)
-                        }
+                        var notify_id = user.notification;
+                        notification_db.findOne({ _id : notify_id}, (errr, notify)=>{
+                            if(notify == null){
+                                var data = {
+                                    notify : [notification]
+                                }
+                                notification_db.insertOne(data, (er, data)=>{
+                                    var Id = data.ops[0]._id;
+                                    user_db.updateOne({ _id : Id}, { $set: { notify : notify }}, (error1, update)=>{
+                                            socket.to(user[user.username]).emit('notify', notification);
+                                        })
+                                })
+                            }else{
+                                var noti = notify.notify;
+                                noti.push(notification)
 
-                        user_db.updateOne({ _id : new mongo.ObjectId(id)}, { $set: { notify : notify }}, (error1, update)=>{
-                                socket.to(user[user.username]).emit('notify', notification);
+                                notification_db.updateOne({ _id : notify_id}, { $set: { notify : noti }}, (error1, update)=>{
+                                    socket.to(user[user.username]).emit('notify', notification);
+                                })
+                            }
                         })
+
+                    })
                 })
-            })
 
             socket.on('disconnect', ()=>{
                 console.log("Disconnect")
@@ -78,8 +89,26 @@ app.get('/*', (req, res, next)=>{
 })
 
 
+//User Profile
+app.post('/api/profile', (req, res, next)=>{
+
+    mongo.MongoClient.connect(MONGO_URI, (err, client)=>{
+        var user_db = client.db('notification').collection('user')
+
+        user_db.findOne({_id : new mongo.ObjectId(req.session._id)}, (error, user)=>{
+            if(user == null){
+                res.status(500).json({"err" : "User doesn't Exist"})
+            }
+            else{
+                res.status(200).json(user);
+            }
+        })
+    })
+})
+
+
 //All Users
-app.get('/api/users', (req, res, next)=>{
+app.post('/api/users', (req, res, next)=>{
 
     mongo.MongoClient.connect(MONGO_URI, (err, client)=>{
 
@@ -90,17 +119,17 @@ app.get('/api/users', (req, res, next)=>{
             var data = new Array();
 
             for(var i = 0; i < users.length; i++){
-                if(user[i]._id != req.session._id){
+                if(users[i]._id != req.session._id){
                     if(data.length == 0){
                         data = [{
-                            user: user[i].name,
-                            _id: user[i]._id
+                            user: users[i].name,
+                            _id: users[i]._id
                         }]
                     }
                     else{
                         data.push({
-                            user: user[i].name,
-                            _id: user[i]._id
+                            user: users[i].name,
+                            _id: users[i]._id
                         })
                     }
                 }

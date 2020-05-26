@@ -4,3 +4,14 @@
 	<button mat-button routerLink="/home">Home</button>
 	<button mat-button routerLink="/notification">Notification</button>
 </mat-toolbar>
+
+<div class="notify">
+	<p class="notify-msg">{{user}} has visited your Profile <button class="cross">&#x2716;</button></p>
+</div>
+
+<mat-card class="profile">
+	<mat-card-content class="profile-detail">
+		<p>Name: {{user_profile.name}}</p>
+		<p>Email: {{user_profile.email}}</p>
+	</mat-card-content>
+</mat-card>

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as io from 'socket.io-client';
 import { Observable } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -12,8 +12,9 @@ export class HomeService {
 	private socket = io('http://localhost:3000')
 	private url = '/api/users';
 
+	httpOptions = new HttpHeaders({'Content-Type':'application/json; charset=utf-8'});
 	getUsers(){
-		return this.http.get(this.url);
+		return this.http.post(this.url, { headers: this.httpOptions, responseType: 'json'});
 	}
 
 	incommingNotification(){

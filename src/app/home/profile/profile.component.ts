@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { NotifyService } from './notify.service';
+import $ from 'jquery'
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-profile',
@@ -7,9 +10,27 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ProfileComponent implements OnInit {
 
-  constructor() { }
+	user: any;
+	constructor( private service : NotifyService,
+			private router : Router ) { 
+		this.service.incommingNotification().subscribe((data)=>{
+			this.user = data.name;
+			$(".notify").show();
+		})
+	}
 
-  ngOnInit(): void {
-  }
+	user_profile: any;
 
+	ngOnInit(): void {
+
+		this.service.getUser().subscribe((result)=>{
+				
+				this.user_profile = result;
+				console.log("YE", this.user_profile)
+		})
+		$(".notify").hide();
+		$(".cross").click(function(){
+			$(".notify").hide();
+		})
+	}
 }
