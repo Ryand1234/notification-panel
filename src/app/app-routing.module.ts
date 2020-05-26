@@ -1,8 +1,17 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import { HomeComponent } from './home/home.component';
+import { AuthenticationComponent } from './authentication/authentication.component';
+import { ProfileComponent } from './home/profile/profile.component';
+import { NotificationComponent } from './home/notification/notification.component';
 
-
-const routes: Routes = [];
+const routes: Routes = [
+{ path: '', redirectTo: "/auth", pathMatch: "full"},
+{ path: 'home', component: HomeComponent },
+{ path: 'auth', component: AuthenticationComponent },
+{ path: 'profile', component: ProfileComponent },
+{ path: 'notification', component: NotificationComponent },
+];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],

@@ -9,12 +9,22 @@ import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { HttpClientModule } from '@angular/common/http'
 import { MatCardModule } from '@angular/material/card';
+import { HomeComponent } from './home/home.component';
+import { AuthenticationComponent } from './authentication/authentication.component';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { ProfileComponent } from './home/profile/profile.component';
+import { NotificationComponent } from './home/notification/notification.component'
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    HomeComponent,
+    AuthenticationComponent,
+    ProfileComponent,
+    NotificationComponent
   ],
   imports: [
+    MatToolbarModule,
     BrowserModule,
     MatCardModule,
     ReactiveFormsModule,
