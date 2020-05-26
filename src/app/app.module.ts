@@ -13,7 +13,8 @@ import { HomeComponent } from './home/home.component';
 import { AuthenticationComponent } from './authentication/authentication.component';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { ProfileComponent } from './home/profile/profile.component';
-import { NotificationComponent } from './home/notification/notification.component'
+import { NotificationComponent } from './home/notification/notification.component';
+import { LogoutComponent } from './home/logout/logout.component'
 
 @NgModule({
   declarations: [
@@ -21,7 +22,8 @@ import { NotificationComponent } from './home/notification/notification.componen
     HomeComponent,
     AuthenticationComponent,
     ProfileComponent,
-    NotificationComponent
+    NotificationComponent,
+    LogoutComponent
   ],
   imports: [
     MatToolbarModule,

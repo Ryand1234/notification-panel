@@ -3,7 +3,7 @@
 	<button class="toolbar-btn" mat-button routerLink="/profile">Profile</button>
 	<button class="toolbar-btn" >Home</button>
 	<button class="toolbar-btn" mat-button routerLink="/notification">Notification</button>
-	<button class="toolbar-btn" mat-button routerLink="/logout">Logout</button>
+	<button class="toolbar-btn" mat-button>Logout</button>
 </mat-toolbar>
 
 
@@ -11,10 +11,6 @@
 	<p class="notify-msg">{{user}} has visited your Profile <button onclick="remove()" class="cross">&#x2716;</button></p>
 </div>
 
-<div *ngFor="let user of user_array">
-	<mat-card class="user">
-		<mat-card-content class="user-detail">
-			<a href="/user/{{user._id}}">{{user.user}}</a>
-		</mat-card-content>
-	</mat-card>
-</div>
+<h3 class="head"> Do you want to LogOut? </h3>
+<button (click)="onSubmit()"> Logout </button>
+<p *ngIf="(msg)">{{msg.msg}}</p>

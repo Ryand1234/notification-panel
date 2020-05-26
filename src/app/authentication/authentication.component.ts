@@ -54,6 +54,13 @@ onResize(event?) {
   });
 
   ngOnInit() {
+    this.loginService.isLogin().subscribe((result)=>{
+          console.log("RES: ",result)
+          if(result['logged'] == true){
+
+            this.router.navigate(['/home']);
+          }
+    })
     this.innerWidth = window.innerWidth;
     if(this.innerWidth < 700){
       $(".login").css({"margin" : "3cm"})
