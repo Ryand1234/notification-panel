@@ -70,7 +70,7 @@ mongo.MongoClient.connect(MONGO_URI,(err, client)=>{
                         user: socket.name,
                         date: current_date
                 }
-console.log("noti: ", notification)
+		console.log("noti: ", notification)
 
                 user_db.findOne({ _id : new mongo.ObjectId(id)}, (error, user)=>{
                         var notify_id = user.notification;
@@ -170,7 +170,7 @@ app.post('/api/notification', (req, res, next)=>{
 //User Profile
 app.post('/api/profile', (req, res, next)=>{
 
-    var id = req.session._id;
+    var id = req.session._id + "notify";
     redisClient.get(id, (err, cache_data)=>{
         if(cache_data == null){
             mongo.MongoClient.connect(MONGO_URI, (err, client)=>{
@@ -188,7 +188,7 @@ app.post('/api/profile', (req, res, next)=>{
             })        
         }
         else{
-
+		console.log("Cache")
             res.status(200).json(JSON.parse(cache_data));
         }
     })
@@ -271,7 +271,7 @@ app.post('/api/user/login', (req, res, next)=>{
                             req.session._id = user._id.toString();
                             req.session.user = user.name;
 
-                            var id = user._id.toString();
+                            var id = user._id.toString() + "notify";
 
 
                             redisClient.setex(id, 600, JSON.stringify(user));
