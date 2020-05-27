@@ -9,7 +9,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 export class HomeService {
 
 	constructor(private http : HttpClient) { }
-	private socket = io('http://localhost:3000')
+	private socket = io('https://notification-panel.herokuapp.com/')
 	private url = '/api/users';
 
 	httpOptions = new HttpHeaders({'Content-Type':'application/json; charset=utf-8'});
