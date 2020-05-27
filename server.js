@@ -58,11 +58,11 @@ mongo.MongoClient.connect(MONGO_URI,(err, client)=>{
             socket.on('con', ()=>{
                 socket.name = user_name;
                 user_socket[user_name] = socket.id;
-                console.log("USER: ",user_socket);
+                console.log("USER: ",socket.name);
             })
 
-            socket.on('check', (data)=>{
-                var id = data._id;
+            socket.on('check', (odata)=>{
+                var id = odata._id;
                 var date = new Date()
                 var day = date.getDate();
                 var month = date.getMonth();
@@ -72,15 +72,18 @@ mongo.MongoClient.connect(MONGO_URI,(err, client)=>{
                         user: socket.name,
                         date: current_date
                 }
-		console.log("noti: ", notification)
+                console.log("ID: ",socket.name)
+                console.log("noti: ", notification)
 
                 user_db.findOne({ _id : new mongo.ObjectId(id)}, (error, user)=>{
+                        console.log("USER")
                         var notify_id = user.notification;
                         notification_db.findOne({ _id : notify_id}, (errr, notify)=>{
                             if(notify == null){
                                 var data = {
                                     notify : [notification]
                                 }
+                                console.log("DATA: ",data)
                                 notification_db.insertOne(data, (er, data)=>{
                                     var Id = data.ops[0]._id;
                                     user_db.updateOne({ _id : id}, { $set: { notification : Id }}, (error1, update)=>{
