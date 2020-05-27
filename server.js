@@ -33,6 +33,7 @@ app.use(session({
     store: new redisStore({ host: REDIS_URI, port: 12212, client: redisClient, ttl: 1600}),
 }));
 
+var user_socket = {}
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -56,7 +57,8 @@ mongo.MongoClient.connect(MONGO_URI,(err, client)=>{
 
             socket.on('con', ()=>{
                 socket.name = user_name;
-                user[user_name] = socket.id;
+                user_socket[user_name] = socket.id;
+                console.log("USER: ",user_socket);
             })
 
             socket.on('check', (data)=>{
@@ -82,7 +84,7 @@ mongo.MongoClient.connect(MONGO_URI,(err, client)=>{
                                 notification_db.insertOne(data, (er, data)=>{
                                     var Id = data.ops[0]._id;
                                     user_db.updateOne({ _id : id}, { $set: { notification : Id }}, (error1, update)=>{
-                                            socket.to(user[user.username]).emit('notify', notification);
+                                            socket.to(user_socket[user.username]).emit('notify', notification);
                                         })
                                 })
                             }else{
@@ -90,7 +92,7 @@ mongo.MongoClient.connect(MONGO_URI,(err, client)=>{
                                 noti.push(notification)
 
                                 notification_db.updateOne({ _id : notify_id}, { $set: { notify : noti }}, (error1, update)=>{
-                                    socket.to(user[user.username]).emit('notify', notification);
+                                    socket.to(user_socket[user.username]).emit('notify', notification);
                                 })
                             }
                         })
@@ -113,7 +115,7 @@ app.get('/*', (req, res, next)=>{
 //User Public Profile
 app.post('/api/profile/:id', (req, res, next)=>{
     
-    var id = req.params.id;
+    var id = req.params.id + "notify";
     redisClient.get(id, (err, cache_data)=>{
         if(cache_data == null){
             mongo.MongoClient.connect(MONGO_URI, (err, client)=>{
@@ -170,7 +172,7 @@ app.post('/api/notification', (req, res, next)=>{
 //User Profile
 app.post('/api/profile', (req, res, next)=>{
 
-    var id = req.session._id + "notify";
+    var id = req.session._id.toString() + "notify";
     redisClient.get(id, (err, cache_data)=>{
         if(cache_data == null){
             mongo.MongoClient.connect(MONGO_URI, (err, client)=>{

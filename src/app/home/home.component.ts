@@ -20,7 +20,8 @@ export class HomeComponent implements OnInit {
 	user_array : any = new Array()
 
 	ngOnInit(): void {
-		
+		this.service.connect();
+
 		this.service.getUsers().subscribe((result)=>{
 				
 				this.user_array = result;

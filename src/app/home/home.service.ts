@@ -17,6 +17,10 @@ export class HomeService {
 		return this.http.post(this.url, { headers: this.httpOptions, responseType: 'json'});
 	}
 
+	connect(){
+		this.socket.emit('con');
+	}
+
 	incommingNotification(){
 		var notify = new Observable<any>(
 			observer => {
