@@ -26,7 +26,7 @@ app.use(logger('dev'));
 app.use(express.static(__dirname + '/dist'));
 app.use(session({
     secret: 'OmegaRanger',
-    resave: false,
+    resave: true,
     saveUninitialized: true,
     name: 'notification_cache',
     cookie: { secure: false},
@@ -70,6 +70,7 @@ mongo.MongoClient.connect(MONGO_URI,(err, client)=>{
                         user: socket.name,
                         date: current_date
                 }
+console.log("noti: ", notification)
 
                 user_db.findOne({ _id : new mongo.ObjectId(id)}, (error, user)=>{
                         var notify_id = user.notification;
