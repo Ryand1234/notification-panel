@@ -80,7 +80,7 @@ mongo.MongoClient.connect(MONGO_URI,(err, client)=>{
                                 }
                                 notification_db.insertOne(data, (er, data)=>{
                                     var Id = data.ops[0]._id;
-                                    user_db.updateOne({ _id : Id}, { $set: { notify : notify }}, (error1, update)=>{
+                                    user_db.updateOne({ _id : id}, { $set: { notification : Id }}, (error1, update)=>{
                                             socket.to(user[user.username]).emit('notify', notification);
                                         })
                                 })
@@ -106,6 +106,63 @@ mongo.MongoClient.connect(MONGO_URI,(err, client)=>{
 //Default Route
 app.get('/*', (req, res, next)=>{
 	res.sendFile(path.join(__dirname, '/dist/notification/index.html'));
+})
+
+
+//User Public Profile
+app.post('/api/profile/:id', (req, res, next)=>{
+    
+    var id = req.params.id;
+    redisClient.get(id, (err, cache_data)=>{
+        if(cache_data == null){
+            mongo.MongoClient.connect(MONGO_URI, (err, client)=>{
+                var user_db = client.db('notification').collection('user')
+
+                console.log("ID: ",id);
+                user_db.findOne({_id : new mongo.ObjectId(id)}, (error, user)=>{
+                    if(user == null){
+                        res.status(500).json({"err" : "User doesn't Exist"})
+                    }
+                    else{
+                        res.status(200).json(user);
+                    }
+                })
+            })        
+        }
+        else{
+
+            res.status(200).json(JSON.parse(cache_data));
+        }
+    })
+})
+
+
+//Show All Notification
+app.post('/api/notification', (req, res, next)=>{
+
+    mongo.MongoClient.connect(MONGO_URI, (err, client)=>{
+
+        var user_db = client.db('notification').collection('user')
+        var notification_db = client.db('notification').collection('notification')
+
+        user_db.findOne({ _id : req.session._id}, (error, user)=>{
+            
+            var noti_id = user.notification;
+            
+            if(noti_id == undefined){
+            
+                res.status(200).json({"msg" : "No Notification"})
+            
+            } else {
+                
+                notification_db.findOne({ _id : noti_id}, (error1, notification)=>{
+                
+                    res.status(200).json(notification.notify);
+                
+                })
+            }
+        })
+    })
 })
 
 
@@ -164,7 +221,7 @@ app.post('/api/users', (req, res, next)=>{
                     var data = new Array();
 
                     for(var i = 0; i < users.length; i++){
-                       // if(users[i]._id != req.session._id){
+                        if(users[i]._id != req.session._id){
                             if(data.length == 0){
                                 data = [{
                                     user: users[i].name,
@@ -177,7 +234,7 @@ app.post('/api/users', (req, res, next)=>{
                                     _id: users[i]._id
                                 })
                             }
-                        //}
+                        }
                     }
                     redisClient.setex('users', 600, JSON.stringify(data))
                     res.status(200).json(data);
@@ -215,7 +272,7 @@ app.post('/api/user/login', (req, res, next)=>{
 
                             var id = user._id.toString();
 
-                        
+
                             redisClient.setex(id, 600, JSON.stringify(user));
 
                             res.status(200).json({"msg" : "Login SuccessFUll"});
@@ -234,9 +291,10 @@ app.post('/api/user/login', (req, res, next)=>{
 //Logout EndPoint
 app.post('/api/user/logout', (req, res, next)=>{
 
-    console.log("ID1: ",req.session._id)
-    redisClient.del(req.session._id, (err, response)=>{
-        if(response == 1){
+    //console.log("ID1: ",req.session._id)
+    redisClient.flushdb( function (err, succeeded) {
+        console.log("SUC: ",succeeded)
+        if(succeeded == "OK"){
             if(req.session._id != null){
                 req.session.destroy((err) => {
 
@@ -257,8 +315,6 @@ app.post('/api/user/logout', (req, res, next)=>{
             res.status(500).json({"err" : "Error in Logout"});
         }
     })
-	
-
 });
 
 
@@ -273,7 +329,7 @@ app.post('/api/user/register', (req, res, next)=>{
                 name : req.body.name,
 				mobile: req.body.mobile,
 				username: req.body.username,
-                notification: new Array()
+                notification: new mongo.ObjectId()
         };
 
         mongo.MongoClient.connect(MONGO_URI, (err, client)=>{

@@ -14,7 +14,8 @@ import { AuthenticationComponent } from './authentication/authentication.compone
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { ProfileComponent } from './home/profile/profile.component';
 import { NotificationComponent } from './home/notification/notification.component';
-import { LogoutComponent } from './home/logout/logout.component'
+import { LogoutComponent } from './home/logout/logout.component';
+import { PublicProfileComponent } from './home/public-profile/public-profile.component'
 
 @NgModule({
   declarations: [
@@ -23,7 +24,8 @@ import { LogoutComponent } from './home/logout/logout.component'
     AuthenticationComponent,
     ProfileComponent,
     NotificationComponent,
-    LogoutComponent
+    LogoutComponent,
+    PublicProfileComponent
   ],
   imports: [
     MatToolbarModule,
