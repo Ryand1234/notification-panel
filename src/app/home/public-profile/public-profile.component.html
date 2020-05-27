@@ -1,8 +1,8 @@
 
 <mat-toolbar class="toolbar">
-	<button>Profile</button>
-	<button mat-button routerLink="/home">Home</button>
-	<button mat-button routerLink="/notification">Notification</button>
+	<button class="toolbar-btn" mat-button routerLink="/profile">Profile</button>
+	<button class="toolbar-btn" mat-button routerLink="/home">Home</button>
+	<button class="toolbar-btn" mat-button routerLink="/notification">Notification</button>
 	<button class="toolbar-btn" mat-button routerLink="/logout">Logout</button>
 </mat-toolbar>
 
@@ -15,6 +15,5 @@
 	<mat-card-content class="profile-detail">
 		<p>Name: {{user_profile.name}}</p>
 		<p>Email: {{user_profile.email}}</p>
-		<p>Mobile: {{user_profile.mobile}}</p>
 	</mat-card-content>
 </mat-card>
