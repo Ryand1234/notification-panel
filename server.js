@@ -62,10 +62,10 @@ mongo.MongoClient.connect(MONGO_URI,(err, client)=>{
             socket.on('check', (data)=>{
                 var id = data._id;
                 var date = new Date()
-                var date = date.getDate();
+                var day = date.getDate();
                 var month = date.getMonth();
                 var year = date.getFullYear();
-                var current_date = date + "/" + (month + 1) + "/" + year;
+                var current_date = day + "/" + (month + 1) + "/" + year;
                 var notification = {
                         user: socket.name,
                         date: current_date
