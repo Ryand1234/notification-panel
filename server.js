@@ -175,7 +175,7 @@ app.post('/api/notification', (req, res, next)=>{
 //User Profile
 app.post('/api/profile', (req, res, next)=>{
 
-    var id = req.session._id
+    var id = req.session._id.toString();
     redisClient.get(id, (err, cache_data)=>{
         if(cache_data == null){
             mongo.MongoClient.connect(MONGO_URI, (err, client)=>{
@@ -280,7 +280,7 @@ app.post('/api/user/login', (req, res, next)=>{
                             req.session._id = user._id.toString();
                             req.session.user = user.name;
 
-                            var id = user._id
+                            var id = user._id.toString();
 
                             redisClient.setex(id, 600, JSON.stringify(user));
 
