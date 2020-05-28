@@ -175,7 +175,7 @@ app.post('/api/notification', (req, res, next)=>{
 //User Profile
 app.post('/api/profile', (req, res, next)=>{
 
-    var id = req.session._id.toString() + "notify";
+    var id = req.session._id
     redisClient.get(id, (err, cache_data)=>{
         if(cache_data == null){
             mongo.MongoClient.connect(MONGO_URI, (err, client)=>{
@@ -216,7 +216,10 @@ app.post('/api/islogin', (req, res, next)=>{
 //All Users
 app.post('/api/users', (req, res, next)=>{
 
-    redisClient.get('users', (err, cache_data)=>{
+    user_name = req.session.username;
+    var id = 'users' + user_name;
+    console.log("AID: ",id)
+    redisClient.get(id, (err, cache_data)=>{
         if(cache_data == null){
             mongo.MongoClient.connect(MONGO_URI, (err, client)=>{
 
@@ -242,7 +245,7 @@ app.post('/api/users', (req, res, next)=>{
                             }
                         }
                     }
-                    redisClient.setex('users', 600, JSON.stringify(data))
+                    redisClient.setex(id, 600, JSON.stringify(data))
                     res.status(200).json(data);
                 })
             })
@@ -272,12 +275,12 @@ app.post('/api/user/login', (req, res, next)=>{
                         var isValid = bcrypt.compareSync(req.body.passwd, user.passwd);  
 			   if(isValid)
                         {
-                            user_name = user.username;
+                            
+                            req.session.username = user.username
                             req.session._id = user._id.toString();
                             req.session.user = user.name;
 
-                            var id = user._id.toString() + "notify";
-
+                            var id = user._id
 
                             redisClient.setex(id, 600, JSON.stringify(user));
 
