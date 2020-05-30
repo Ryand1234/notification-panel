@@ -119,7 +119,7 @@ app.get('/*', (req, res, next)=>{
 //User Public Profile
 app.post('/api/profile/:id', (req, res, next)=>{
 
-	user_name = req.session.user_name;
+	user_name = req.session.username;
     var id = req.params.id
     redisClient.get(id, (err, cache_data)=>{
         if(cache_data == null){
