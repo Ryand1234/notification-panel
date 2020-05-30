@@ -74,7 +74,7 @@ mongo.MongoClient.connect(MONGO_URI,(err, client)=>{
                         user: user_reverse_socket[socket.id],
                         date: current_date
                 }
-                console.log("ID: ",user_reverse_socket[socket.id])
+                console.log("ID: ",user_reverse_socket[socket.id]," iD: ",socket.id)
                 console.log("noti: ", notification)
 
                 user_db.findOne({ _id : new mongo.ObjectId(id)}, (error, user)=>{
@@ -154,19 +154,19 @@ app.post('/api/notification', (req, res, next)=>{
         var notification_db = client.db('notification').collection('notification')
 
         user_db.findOne({ _id : req.session._id}, (error, user)=>{
-            
+
             var noti_id = user.notification;
-            
+
             if(noti_id == undefined){
-            
+
                 res.status(200).json({"msg" : "No Notification"})
-            
+
             } else {
-                
+
                 notification_db.findOne({ _id : noti_id}, (error1, notification)=>{
-                
+
                     res.status(200).json(notification.notify);
-                
+
                 })
             }
         })
