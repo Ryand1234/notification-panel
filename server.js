@@ -34,7 +34,6 @@ app.use(session({
 }));
 
 var user_socket = {}
-var user_reverse_socket = {}
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -57,10 +56,9 @@ mongo.MongoClient.connect(MONGO_URI,(err, client)=>{
     io.on('connection', (socket)=>{
 
             socket.on('con', ()=>{
-                socket.user_name = user_name;
+                socket.user = user_name;
                 user_socket[user_name] = socket.id;
-                user_reverse_socket[socket.id] = user_name
-                console.log("USER: ",user_reverse_socket);
+                console.log("USER: ",socket);
             })
 
             socket.on('check', (odata)=>{
@@ -71,10 +69,11 @@ mongo.MongoClient.connect(MONGO_URI,(err, client)=>{
                 var year = date.getFullYear();
                 var current_date = day + "/" + (month + 1) + "/" + year;
                 var notification = {
-                        user: user_reverse_socket[socket.id],
+                        user: socket.user,
                         date: current_date
-                }
-                console.log("ID: ",user_reverse_socket[socket.id]," iD: ",socket.id)
+               }
+
+                console.log("ID: ",socket)
                 console.log("noti: ", notification)
 
                 user_db.findOne({ _id : new mongo.ObjectId(id)}, (error, user)=>{
@@ -247,6 +246,7 @@ app.post('/api/users', (req, res, next)=>{
                             }
                         }
                     }
+
                     redisClient.setex(id, 600, JSON.stringify(data))
                     res.status(200).json(data);
                 })
