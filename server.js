@@ -58,7 +58,8 @@ mongo.MongoClient.connect(MONGO_URI,(err, client)=>{
             socket.on('con', ()=>{
                 socket.user_name = user_name;
                 user_socket[user_name] = socket.id;
-                console.log("USER: ",socket.user_name);
+                user_reverse_socket[socket.id] = user_name
+                console.log("USER: ",user_reverse_socket);
             })
 
             socket.on('check', (odata)=>{
@@ -69,14 +70,14 @@ mongo.MongoClient.connect(MONGO_URI,(err, client)=>{
                 var year = date.getFullYear();
                 var current_date = day + "/" + (month + 1) + "/" + year;
                 var notification = {
-                        user: socket.user_name,
+                        user: user_reverse_socket[socket.id],
                         date: current_date
                 }
-                console.log("ID: ",socket.user_name)
+                console.log("ID: ",user_reverse_socket[socket.id])
                 console.log("noti: ", notification)
 
                 user_db.findOne({ _id : new mongo.ObjectId(id)}, (error, user)=>{
-                        console.log("USER")
+                        //console.log("USER")
                         var notify_id = user.notification;
                         notification_db.findOne({ _id : notify_id}, (errr, notify)=>{
                             if(notify == null){
@@ -117,7 +118,7 @@ app.get('/*', (req, res, next)=>{
 
 //User Public Profile
 app.post('/api/profile/:id', (req, res, next)=>{
-    
+
     var id = req.params.id
     redisClient.get(id, (err, cache_data)=>{
         if(cache_data == null){
