@@ -69,7 +69,7 @@ mongo.MongoClient.connect(MONGO_URI,(err, client)=>{
                 var year = date.getFullYear();
                 var current_date = day + "/" + (month + 1) + "/" + year;
                 var notification = {
-                        user: socket.user,
+                        name: socket.user,
                         date: current_date
                }
 
