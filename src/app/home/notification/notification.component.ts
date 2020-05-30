@@ -9,6 +9,7 @@ import $ from "jquery"
 })
 export class NotificationComponent implements OnInit {
 
+	user: any;
 	constructor(private service : NotificationService) { 
 		this.service.incommingNotification().subscribe((data)=>{
 			this.user = data.name;
@@ -21,7 +22,7 @@ export class NotificationComponent implements OnInit {
 	ngOnInit(): void {
 
 		this.service.notification().subscribe((result)=>{
-			notification_array = result;
+			this.notification_array = result;
 			this.service.connect();
 		});
 		$(".notify").hide();
