@@ -34,6 +34,7 @@ app.use(session({
 }));
 
 var user_socket = {}
+var user_reverse_socket = {}
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));

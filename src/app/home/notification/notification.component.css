@@ -1,4 +1,4 @@
-button{
+.toolbar-btn{
 	display: block;
 	flex: 1 1 auto;
 	background: none;
@@ -7,7 +7,7 @@ button{
 
 }
 
-button:hover {
+.toolbar-btn:hover {
 	transform: skew(10deg);
 	box-shadow: 10px 10px 10px pink;
 }
@@ -15,4 +15,47 @@ button:hover {
 
 .toolbar{
 	background-color: black;
+}
+
+.notify{
+	color: black;
+	background-color: white;
+	border: 5px solid blue;
+	text-align: center;
+}
+
+.cross{
+	font-size: 25px;
+	color: red;
+	float: right;
+	border: none;
+	margin-bottom: 5px;
+	background: none;
+}
+
+.cross:hover {
+	box-shadow: 10px 10px 10px grey;
+}
+
+.notify-msg{
+	margin: 15px ;
+	background-color: white;
+
+}
+
+.notification{
+	text-align: center;
+	box-shadow: 20px 20px 20px grey;
+	margin-top: 10px;
+}
+
+.notification-detail{
+	margin-top: 10px;
+	padding: 15px;
+	box-shadow: 10px 10px 10px cyan;
+	background-color: lightgreen;
+}
+
+p {
+	font-size: 20px;
 }

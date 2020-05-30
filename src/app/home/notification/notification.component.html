@@ -1,7 +1,20 @@
-
 <mat-toolbar class="toolbar">
 	<button mat-button routerLink="/profile">Profile</button>
 	<button mat-button routerLink="/home">Home</button>
 	<button>Notification</button>
 	<button class="toolbar-btn" mat-button routerLink="/logout">Logout</button>
 </mat-toolbar>
+
+<div class="notify">
+	<p class="notify-msg">{{user}} has visited your Profile <button onclick="remove()" class="cross">&#x2716;</button></p>
+</div>
+
+<div *ngFor="let notification of notification_array">
+	<mat-card class="notification">
+		<mat-card-content class="notification-detail">
+			<p>{{notification.user}}</p>
+			<p>{{notification.date}}</p>
+		</mat-card-content>
+	</mat-card>
+</div>
+
