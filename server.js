@@ -58,7 +58,7 @@ mongo.MongoClient.connect(MONGO_URI,(err, client)=>{
             socket.on('con', ()=>{
                 socket.user = user_name;
                 user_socket[user_name] = socket.id;
-                console.log("USER: ",socket);
+                console.log("USER: ",socket.user);
             })
 
             socket.on('check', (odata)=>{
@@ -73,7 +73,7 @@ mongo.MongoClient.connect(MONGO_URI,(err, client)=>{
                         date: current_date
                }
 
-                console.log("ID: ",socket)
+                console.log("ID: ",socket.user)
                 console.log("noti: ", notification)
 
                 user_db.findOne({ _id : new mongo.ObjectId(id)}, (error, user)=>{
@@ -119,6 +119,7 @@ app.get('/*', (req, res, next)=>{
 //User Public Profile
 app.post('/api/profile/:id', (req, res, next)=>{
 
+	user_name = req.session.user_name;
     var id = req.params.id
     redisClient.get(id, (err, cache_data)=>{
         if(cache_data == null){
@@ -219,7 +220,7 @@ app.post('/api/users', (req, res, next)=>{
 
     user_name = req.session.username;
     var id = 'users' + user_name;
-    console.log("AID: ",id," USER: ",user_name)
+//    console.log("AID: ",id," USER: ",user_name)
     redisClient.get(id, (err, cache_data)=>{
         if(cache_data == null){
             mongo.MongoClient.connect(MONGO_URI, (err, client)=>{

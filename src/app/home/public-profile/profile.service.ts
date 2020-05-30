@@ -17,7 +17,10 @@ export class ProfileService {
         		var new_url = this.url + token
                 return this.http.post(new_url, { headers: this.httpOptions, responseType: 'json'});
         }
-
+	
+	connect(){
+                this.socket.emit('con');
+        }
         
         notifyUser(data: any){
                 this.socket.emit('check', data);

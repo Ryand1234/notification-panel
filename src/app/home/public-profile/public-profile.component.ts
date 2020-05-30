@@ -30,7 +30,8 @@ export class PublicProfileComponent implements OnInit {
 		this.service.getUser(this.token).subscribe((result)=>{
 				
 				this.user_profile = result;
-				console.log("YE", this.user_profile)
+				this.service.connect();
+//				console.log("YE", this.user_profile)
 		})
 
 		var data = {
