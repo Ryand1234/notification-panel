@@ -58,7 +58,7 @@ mongo.MongoClient.connect(MONGO_URI,(err, client)=>{
             socket.on('con', ()=>{
                 socket.user_name = user_name;
                 user_socket[user_name] = socket.id;
-                console.log("USER: ",socket.name);
+                console.log("USER: ",socket.user_name);
             })
 
             socket.on('check', (odata)=>{
@@ -218,7 +218,7 @@ app.post('/api/users', (req, res, next)=>{
 
     user_name = req.session.username;
     var id = 'users' + user_name;
-    console.log("AID: ",id)
+    console.log("AID: ",id," USER: ",user_name)
     redisClient.get(id, (err, cache_data)=>{
         if(cache_data == null){
             mongo.MongoClient.connect(MONGO_URI, (err, client)=>{
@@ -302,7 +302,7 @@ app.post('/api/user/logout', (req, res, next)=>{
 
     //console.log("ID1: ",req.session._id)
     redisClient.flushdb( function (err, succeeded) {
-        console.log("SUC: ",succeeded)
+        //console.log("SUC: ",succeeded)
         if(succeeded == "OK"){
             if(req.session._id != null){
                 req.session.destroy((err) => {
