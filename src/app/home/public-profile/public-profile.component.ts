@@ -27,10 +27,10 @@ export class PublicProfileComponent implements OnInit {
 		this.token = this.router.url.split('/')[2]
 		console.log("TOKEN: ",this.token);
 
+		this.service.connect();
 		this.service.getUser(this.token).subscribe((result)=>{
 				
 				this.user_profile = result;
-				this.service.connect();
 //				console.log("YE", this.user_profile)
 		})
 
