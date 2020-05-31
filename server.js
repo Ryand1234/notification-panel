@@ -33,7 +33,7 @@ app.use(session({
     store: new redisStore({ host: REDIS_URI, port: 12212, client: redisClient, ttl: 1600}),
 }));
 
-var user_socket = {}
+var user_socket = new Object()
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -106,6 +106,8 @@ mongo.MongoClient.connect(MONGO_URI,(err, client)=>{
 
             socket.on('disconnect', ()=>{
                 console.log("Disconnect")
+		delete user_socket[socket.user]
+		console.log("USER SOCKET: ",user_socket);
             })
     })
 })
