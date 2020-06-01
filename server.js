@@ -155,7 +155,7 @@ app.post('/api/notification', (req, res, next)=>{
         var user_db = client.db('notification').collection('user')
         var notification_db = client.db('notification').collection('notification')
 
-        user_db.findOne({ _id : req.session._id}, (error, user)=>{
+        user_db.findOne({ _id : new mongo.ObjectId(req.session._id)}, (error, user)=>{
 
             var noti_id = user.notification;
 
