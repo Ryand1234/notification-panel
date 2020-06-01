@@ -87,7 +87,7 @@ mongo.MongoClient.connect(MONGO_URI,(err, client)=>{
                                 console.log("DATA: ",data)
                                 notification_db.insertOne(data, (er, data)=>{
                                     var Id = data.ops[0]._id;
-                                    user_db.updateOne({ _id : id}, { $set: { notification : Id }}, (error1, update)=>{
+                                    user_db.updateOne({ _id : new mongo.ObjectId(id)}, { $set: { notification : Id }}, (error1, update)=>{
                                             socket.to(user_socket[user.username]).emit('notify', notification);
                                         })
                                 })
